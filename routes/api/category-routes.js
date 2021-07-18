@@ -51,10 +51,10 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
   Category.update({
+    where: {
+      id: req.bdy.category_name
+    },
     category_name: req.body.category_name
-  },
-  {
-  where: {id: req.body.category_name}
   }).then(categoryData => res.json(categoryData)).catch(err => {
     console.log(err);
     res.status(500).json(err);
