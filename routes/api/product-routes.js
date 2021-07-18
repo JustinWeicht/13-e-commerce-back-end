@@ -118,7 +118,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// Delete/Destroy the user specified category
+// Delete/Destroy the user specified product
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
   Category.destroy({

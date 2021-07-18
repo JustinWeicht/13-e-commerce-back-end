@@ -43,7 +43,7 @@ router.post('/', (req, res) => {
     category_name: res.body.category_name
   }).then(categoryData => res.json(categoryData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(400).json(err);
   });
 });
 
@@ -57,7 +57,7 @@ router.put('/:id', (req, res) => {
     category_name: req.body.category_name
   }).then(categoryData => res.json(categoryData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(400).json(err);
   });
 });
 
