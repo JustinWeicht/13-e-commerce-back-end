@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
   Product.findAll({
+    attributes: ['id', 'product_name', 'price', 'stock'],
     include: [
       {
         model: Category,
@@ -20,7 +21,7 @@ router.get('/', (req, res) => {
     ]
   }).then(productData => res.json(productData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(404).json(err);
   });
 });
 
@@ -32,6 +33,7 @@ router.get('/:id', (req, res) => {
     where: {
       id: req.params.id
     },
+    attributes: ['id', 'product_name', 'price', 'stock'],
     include: [{
       model: Category,
       attributes: ['category_name']
@@ -42,7 +44,7 @@ router.get('/:id', (req, res) => {
     }]
   }).then(productData => res.json(productData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(404).json(err);
   });
 });
 
@@ -119,7 +121,7 @@ router.put('/:id', (req, res) => {
     })
     .then((updatedProductTags) => res.json(updatedProductTags))
     .catch((err) => {
-      // console.log(err);
+      console.log(err);
       res.status(400).json(err);
     });
 });
@@ -133,7 +135,7 @@ router.delete('/:id', (req, res) => {
     }
   }).then(productData => res.json(productData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(400).json(err);
   });
 });
 

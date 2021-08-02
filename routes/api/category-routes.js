@@ -10,11 +10,11 @@ router.get('/', (req, res) => {
   Category.findAll({
     include: {
       model: Product,
-      attributes: ['product_name']
+      attributes: ['id', 'category_name', 'product_name', 'price', 'stock', 'category_id']
     }
   }).then(categoryData => res.json(categoryData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(404).json(err);
   });
 });
 
@@ -28,11 +28,11 @@ router.get('/:id', (req, res) => {
     },
     include: {
       model: Product,
-      attributes: ['category_id']
+      attributes: ['id', 'category_name', 'product_name', 'price', 'stock', 'category_id']
     }
   }).then(categoryData => res.json(categoryData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(404).json(err);
   });
 });
 
@@ -52,7 +52,7 @@ router.put('/:id', (req, res) => {
   // update a category by its `id` value
   Category.update({
     where: {
-      id: req.body.category_name
+      id: req.params.id
     },
     category_name: req.body.category_name
   }).then(categoryData => res.json(categoryData)).catch(err => {
@@ -70,7 +70,7 @@ router.delete('/:id', (req, res) => {
     }
   }).then(categoryData => res.json(categoryData)).catch(err => {
     console.log(err);
-    res.status(500).json(err);
+    res.status(400).json(err);
   });
 });
 
