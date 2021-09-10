@@ -24,7 +24,7 @@
   - Follow along with the demonstration video to create the schema.sql and seed the database.
 
   ## License
-  This application uses the MIT license
+  This application uses the MIT license.
   
   ## Testing
   No packages were used to test this application.
