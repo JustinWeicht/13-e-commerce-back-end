@@ -156,7 +156,7 @@ router.put('/:id', (req, res) => {
 // DELETE the user specified Product
 router.delete('/:id', (req, res) => {
   // .destroy to remove the specified Product
-  Category.destroy({
+  Product.destroy({
     where: {
       id: req.params.id
     }
