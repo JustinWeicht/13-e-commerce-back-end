@@ -1,38 +1,46 @@
 const router = require('express').Router();
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
-// The `/api/products` endpoint
+// http://localhost:3001/api/products(router.get)
 
-// get all products
+// GET/Find all Products
 router.get('/', (req, res) => {
-  // find all products
-  // be sure to include its associated Category and Tag data
+  // .findAll to display all current Product entries
   Product.findAll({
+    // w/ the specified Product attributes below
     attributes: ['id', 'product_name', 'price', 'stock'],
+    // Product data to be included in the response
     include: [
       {
+        // include the parent model, Category for each Product
         model: Category,
         attributes: ['category_name']
       },
       {
+        // include child Tags for each Category
         model: Tag,
         attributes: ['tag_name']
       }
     ]
+    // respond with the productData from the database
   }).then(productData => res.json(productData)).catch(err => {
     console.log(err);
-    res.status(404).json(err);
+    // 500 - unexpected server condition
+    res.status(500).json(err);
   });
 });
+// Example: 
+// GET http://localhost:3001/api/products/
 
-// get one product
-router.get('/:id', (req, res) => {
-  // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
+// GET a single Product
+router.get('/:id', (req, res) => { // replace :id with desired Product ID number
+  // .findOne to display specific Product
   Product.findOne({
     where: {
+      // use the requested Product ID from the router.get() parameter
       id: req.params.id
     },
+    // Product parameters to include
     attributes: ['id', 'product_name', 'price', 'stock'],
     include: [{
       model: Category,
@@ -44,55 +52,65 @@ router.get('/:id', (req, res) => {
     }]
   }).then(productData => res.json(productData)).catch(err => {
     console.log(err);
+    // 404 - Product was not found
     res.status(404).json(err);
   });
 });
+// Example: 
+// GET http://localhost:3001/api/poducts/6(Product-ID)
 
-// create new product
+// POST/Create a new product
 router.post('/', (req, res) => {
-  /* req.body should look like this...
-    {
-      product_name: "Basketball",
-      price: 200.00,
-      stock: 3,
-      tagIds: [1, 2, 3, 4]
-    }
-  */
+  // .create to create new Product
   Product.create({
+    // expected req.body input(s)
     product_name: req.body.product_name,
     price: req.body.price,
     stock: req.body.stock,
     tagIds: req.body.tagIds
-    }).then((product) => {
-      // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
-          return {
-            product_id: product.id,
-            tag_id,
-          };
-        });
-        return ProductTag.bulkCreate(productTagIdArr);
-      }
-      // if no product tags, just respond
-      res.status(200).json(product);
-    })
-    .then((productTagIds) => res.status(200).json(productTagIds))
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json(err);
-    });
+  // pass the product request into an if/else function 
+  }).then((product) => {
+    // if there's product tags, we need to create pairings to bulk create in the ProductTag model
+    if (req.body.tagIds.length) {
+      const productTagIdArr = req.body.tagIds.map((tag_id) => {
+        return {
+          product_id: product.id,
+          tag_id,
+        };
+      });
+      return ProductTag.bulkCreate(productTagIdArr);
+    }
+    // if no product tags, just respond
+    // 200 - OK success resopnse
+    res.status(200).json(product);
+  })
+  // 
+  .then((productTagIds) => res.status(200).json(productTagIds))
+  .catch((err) => {
+    console.log(err);
+    // 400 - bad request
+    res.status(400).json(err);
+  });
 });
+// Example: 
+// PUT http://localhost:3001/api/products/
+// req.body: 
+// {
+//   "product_name": "Skinny Fit",
+//   "price": 200.00,
+//   "stock": 3,
+//   "tagIds": [1, 2, 3, 4]
+// }
 
-// update product
+// PUT/Update an existing Product
 router.put('/:id', (req, res) => {
-  // update product data
+  // .update to overwrite an existing Product
   Product.update(req.body, {
     where: {
       id: req.params.id,
     },
   })
-    .then((Product) => {
+    .then((product) => {
       // find all associated tags from ProductTag
       return ProductTag.findAll({ where: { product_id: req.params.id } });
     })
@@ -122,20 +140,29 @@ router.put('/:id', (req, res) => {
     .then((updatedProductTags) => res.json(updatedProductTags))
     .catch((err) => {
       console.log(err);
-      res.status(400).json(err);
+      res.status(404).json(err);
     });
 });
+// Example: 
+// PUT http://localhost:3001/api/products/6
+// req.body: 
+// {
+//   "product_name": "Skinny Fit",
+//   "price": 200.00,
+//   "stock": 3,
+//   "tagIds": [1, 2, 3, 4]
+// }
 
-// Delete/Destroy the user specified product
+// DELETE the user specified Product
 router.delete('/:id', (req, res) => {
-  // delete one product by its `id` value
+  // .destroy to remove the specified Product
   Category.destroy({
     where: {
       id: req.params.id
     }
   }).then(productData => res.json(productData)).catch(err => {
     console.log(err);
-    res.status(400).json(err);
+    res.status(404).json(err);
   });
 });
 

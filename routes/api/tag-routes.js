@@ -1,28 +1,33 @@
 const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
-// The `/api/tags` endpoint
+// http://localhost:3001/api/tags(router.get)
 
-// Get/Find all of the tag
+// Get all tags
 router.get('/', (req, res) => {
-  // find all tags
-  // be sure to include its associated Product data
+  // .findAll to display all current Category entries
   Tag.findAll({
+    // Tag data to be included in the response
     include: {
+      // include the parent model, Category for each Tag
       model: Product
     }
+    // respond with the tagData from the database
   }).then(tagData => res.json(tagData)).catch(err => {
     console.log(err);
-    res.status(404).json(err);
+    // 500 - unexpected server condition
+    res.status(500).json(err);
   });
 });
+// Example: 
+// GET http://localhost:3001/api/tags/
 
-// Get/Find one of the user specified tags
-router.get('/:id', (req, res) => {
-  // find a single tag by its `id`
-  // be sure to include its associated Product data
+// GET a single Tag
+router.get('/:id', (req, res) => { // replace :id with desired Tag ID number
+  // .findOne to display specific Tag
   Tag.findOne({
     where: {
+      // use the requested Tag ID from the router.get() parameter
       id: req.params.id
     },
     include: {
@@ -30,46 +35,65 @@ router.get('/:id', (req, res) => {
     }
   }).then(tagData => res.json(tagData)).catch(err => {
     console.log(err);
+    // 404 - Tag was not found
     res.status(404).json(err);
   });
 });
+// Example: 
+// GET http://localhost:3001/api/tags/6(Tag-ID)
 
-// Post/Create a new tag
+// POST/Create a new tag
 router.post('/', (req, res) => {
-  // create a new tag
+  // .create to create new Tag
   Tag.create({
+    // expected req.body input(s)
     tag_name: req.body.tag_name
   }).then(tagData => res.json(tagData)).catch(err => {
     console.log(err);
+    // 400 - bad request
     res.status(400).json(err);
   });
 });
+// Example: 
+// POST http://localhost:3001/api/tags/
+// req.body: 
+// {
+//   "tag_name": "black"
+// }
 
-// Put/Update an existing tag
+// PUT/Update an existing Tag
 router.put('/:id', (req, res) => {
-  // update a tag's name by its `id` value
-  Tag.update({
+  // .update to overwrite an existing Tag
+  Tag.update(req.body, {
     where: {
       id: req.params.id
     },
-    tag_name: req.params.id
+    tag_name: req.body.tag_name
   }).then(tagData => res.json(tagData)).catch(err => {
     console.log(err);
-    res.status(400).json(err);
+    res.status(404).json(err);
   });
 });
+// Example: 
+// PUT http://localhost:3001/api/tags/9(Tag-ID)
+// req.body: 
+// {
+//   "tag_name": "dark blue"
+// }
 
-// Delete/Destroy a user specified tag
+// DELETE the user specified Tag
 router.delete('/:id', (req, res) => {
-  // delete on tag by its `id` value
-  Category.destroy({
+  // .destroy to remove the specified Tag
+  Tag.destroy({
     where: {
       id: req.params.id
     }
   }).then(tagData => res.json(tagData)).catch(err => {
     console.log(err);
-    res.status(400).json(err);
+    res.status(404).json(err);
   });
 });
+// Example: 
+// DELETE http://localhost:3001/api/tags/6(Tag-ID)
 
 module.exports = router;
